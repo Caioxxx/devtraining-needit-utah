@@ -29,18 +29,24 @@
         <role_conditions/>
         <script><![CDATA[(function executeRule(current, previous /*null when async*/ ) {
 
-    // rightnow stores the current time (rightnow armazena a hora atual)
-    var rightnow = new GlideDateTime();
-    // Create a GlideDateTime object for the When needed date
-    var whenNeeded = new GlideDateTime(current.u_when_needed);
+    // Instancie a classe NeedItUtils. Chame o método isDatePast e passe o valor u_when_needed.
+    var niutils = new NeedItUtils();
+    var isPast = niutils.isDatePast(current.u_when_needed);
 
-    // Se a data "When needed" for anterior a este momento, não grave o registro no banco de dados
-    // Envia uma mensagem de erro na tela
-    if (whenNeeded.before(rightnow)) {
-        gs.addErrorMessage("A data 'When needed' não pode estar no passado. Sua solicitação não foi salva no banco de dados");
+    // Se o método isDatePast retornar verdadeiro, a data está no passado.
+    if (isPast == true) {
+        gs.addErrorMessage("A data 'Quando necessário' não pode estar no passado. Sua solicitação não foi salva no banco de dados.");
         current.setAbortAction(true);
     }
-    //Não permitir solicitações no mesmo dia
+    // pass the When needed field value to the isDateToday method in NeedItUtils
+    var isToday = niutils.isDateToday(current.u_when_needed);
+
+    // if the isDateToday method returns true the When needed date is today 
+    if (isToday == true) {
+        gs.addErrorMessage("Você não pode enviar solicitações NeedIt para hoje.");
+        current.setAbortAction(true);
+    }
+    /*Não permitir solicitações no mesmo dia
     // Obtém a parte da data agora mesmo e quando necessário (sem carimbo de data/hora)
     var today = rightnow.getLocalDate();
     var istoday = whenNeeded.getLocalDate();
@@ -48,7 +54,7 @@
     if (today.compareTo(istoday) == 0) {
         gs.addErrorMessage("Você não pode enviar solicitações NeedIt para hoje.");
         current.setAbortAction(true);
-    }
+    }*/
 
 })(current, previous);]]></script>
         <sys_class_name>sys_script</sys_class_name>
@@ -57,7 +63,7 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>398efa0a476382107ef59d2f316d431a</sys_id>
-        <sys_mod_count>3</sys_mod_count>
+        <sys_mod_count>8</sys_mod_count>
         <sys_name>NeedIt When needed field date</sys_name>
         <sys_overrides/>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
@@ -65,7 +71,7 @@
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_script_398efa0a476382107ef59d2f316d431a</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-23 23:30:06</sys_updated_on>
+        <sys_updated_on>2024-07-24 16:59:16</sys_updated_on>
         <template/>
         <when>before</when>
     </sys_script>
